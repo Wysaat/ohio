@@ -5,7 +5,6 @@ jmp    start
 
 ; included file's content is put exactly where %include is put
 %include "print.inc"
-%include "disk.inc"
 
 message1  db "Successfully set up segment and stack registers...", 10, 13, 0
 message2  db "Successfully read 64 sectors from disk...", 10, 13, 0
@@ -31,18 +30,22 @@ start:
     call   print
 
 ; read 64 sectors from the 11th sector on disk to 0x8000
-;
 ; according to widipedia, "Addressing of Buffer should guarantee that the 
 ; complete buffer is inside the given segment, i.e. ( BX + size_of_buffer ) 
 ; <= 10000h. Otherwise the interrupt may fail with some BIOS or hardware 
 ; versions."
-;
     mov    al, 64
     mov    bx, 0x8000
-    call   read_sectors
-    cmp    ax, 0
-    jnz    rs_error
+    mov    ah, 2
+    mov    ch, 0
+    mov    cl, 11
+    mov    dh, 0
+    mov    bx, 0x8000
+    int    0x13
 
+    jc     rs_error
+    cmp    al, 64
+    jb     rs_error
 rs_succ:
     mov    si, message2
     call   print

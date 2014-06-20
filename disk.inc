@@ -1,3 +1,5 @@
+bits    16
+
 ; read al sectors, from the 11th sector on disk to bx
 read_sectors:
     push   bx

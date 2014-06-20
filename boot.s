@@ -3,13 +3,15 @@ org    0x7c00
 
 jmp    start
 
-; included file's content is put exactly where %include is put
+; included file's content is put exactly where the %include is put
 %include "print.inc"
 %include "disk.inc"
+%include "gdt.inc"
 
 message1  db "Successfully set up segment and stack registers...", 10, 13, 0
 message2  db "Successfully read 64 sectors from disk...", 10, 13, 0
 message3  db "Failed to read 64 sectors from disk...", 10, 13, 0
+message4  db "Successfully loaded a gdt and jumped to 32 bit pmode", 10, 13, 0
 
 start:
 
@@ -46,12 +48,49 @@ start:
 rs_succ:
     mov    si, message2
     call   print
-    cli
-    hlt
+    jmp    load_gdt
 
 rs_error:
     mov    si, message3
     call   print
+    cli
+    hlt
+
+; load our global discriptor table
+load_gdt:
+    lgdt   [gdtp]
+
+; jump to protedted mode, use our pmode 32 bit code segment descriptor at 0x8 in gdt
+    cli
+    jmp    0x8:pmode_start
+
+bits    32
+
+%include "print32.inc"
+
+pmode_start:
+
+; set up segment registers
+    mov    ax, 0x10
+    mov    ds, ax
+    mov    es, ax
+    mov    fs, ax
+    mov    gs, ax
+    mov    ss, ax
+
+; set up a stack
+    mov    ax, 0x7b00
+    mov    sp, ax
+    mov    bp, ax
+
+; print a message to the 11th line
+    mov    al, 10
+    mov    bl, 0
+    call   movxy
+
+    mov    si, message4
+    call   print32
+
     cli
     hlt
 

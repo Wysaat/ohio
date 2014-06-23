@@ -27,11 +27,13 @@ print32:
     lodsb
     cmp    al, 0
     jz     .end
-    mov    byte [fb_pointer], al
-    inc    byte [fb_pointer]
+    mov    ebx, [fb_pointer]
+    mov    byte [ebx], al
+    inc    ebx
     ; set color to black background and white character
-    mov    byte [fb_pointer], 15
-    inc    byte [fb_pointer]
+    mov    byte [ebx], 15
+    inc    ebx
+    mov    [fb_pointer], ebx
     jmp    .putchar
 .end:
     popa

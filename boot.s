@@ -11,7 +11,7 @@ jmp    start
 message1  db "Successfully set up segment and stack registers...", 10, 13, 0
 message2  db "Successfully read 64 sectors from disk...", 10, 13, 0
 message3  db "Failed to read 64 sectors from disk...", 10, 13, 0
-message4  db "Successfully loaded a gdt and jumped to 32 bit pmode", 10, 13, 0
+message4  db "Successfully loaded a gdt and jumped to 32 bit pmode...", 0
 
 start:
 
@@ -34,7 +34,7 @@ start:
 
 ; read 64 sectors from the 11th sector on disk to 0x8000
 ;
-; according to widipedia, "Addressing of Buffer should guarantee that the 
+; according to wikipedia, "Addressing of Buffer should guarantee that the 
 ; complete buffer is inside the given segment, i.e. ( BX + size_of_buffer ) 
 ; <= 10000h. Otherwise the interrupt may fail with some BIOS or hardware 
 ; versions."
@@ -60,6 +60,11 @@ rs_error:
 load_gdt:
     lgdt   [gdtp]
 
+; don't forget to enable pmode before jumping
+    mov    eax, cr0
+    or     eax, 1
+    mov    cr0, eax
+
 ; jump to protedted mode, use our pmode 32 bit code segment descriptor at 0x8 in gdt
     cli
     jmp    0x8:pmode_start
@@ -76,23 +81,25 @@ pmode_start:
     mov    es, ax
     mov    fs, ax
     mov    gs, ax
-    mov    ss, ax
+    mov    ss, eax
 
 ; set up a stack
-    mov    ax, 0x7b00
-    mov    sp, ax
-    mov    bp, ax
+    mov    eax, 0x7b00
+    mov    esp, eax
+    mov    ebp, eax
 
 ; print a message to the 11th line
-    mov    al, 10
-    mov    bl, 0
+    mov    al, 0
+    mov    bl, 10
     call   movxy
 
     mov    si, message4
     call   print32
 
     cli
-    hlt
+
+; jump to our kernel, already loaded at 0x8000
+    jmp    0x8000
 
 times 510-($-$$) db 0
 dw     0xaa55

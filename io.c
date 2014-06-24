@@ -2,17 +2,6 @@
 
 int fb_pointer = fb_addr;
 
-//     pusha
-//     mov    cl, 2
-//     mul    cl
-//     mov    cx, ax
-//     mov    al, 160
-//     mul    bl
-//     add    ax, cx
-//     add    word [fb_pointer], ax
-//     popa
-//     ret
-
 void movxy(int x, int y) {
     __asm__ __volatile__(
         "pusha\n\
@@ -27,24 +16,6 @@ void movxy(int x, int y) {
          : /* no output registers */
          : "a" (x), "b" (y));
 }
-
-// print32:
-//     pusha
-// .putchar:
-//     lodsb
-//     cmp    al, 0
-//     jz     .end
-//     mov    ebx, [fb_pointer]
-//     mov    byte [ebx], al
-//     inc    ebx
-//     ; set color to black background and white character
-//     mov    byte [ebx], 15
-//     inc    ebx
-//     mov    [fb_pointer], ebx
-//     jmp    .putchar
-// .end:
-//     popa
-//     ret
 
 /* CAUTION: use "S" (uppercase not lowercase "s") to specify esi
  * AND ALSO CAUTION: gcc doesn't always give correct line numbers 
@@ -70,4 +41,21 @@ void print(char *string) {
          popa\n"
          : /* no output registers */
          : "S" (string));
+}
+
+unsigned char inb(unsigned short port) {
+    unsigned char ch;
+    __asm__ __volatile__ (
+        "in     %%dx, %%al\n"
+        /* output operand constraint should have a constraint modifier "=" */
+        : "=a" (ch)
+        : "d" (port));
+    return ch;
+}
+
+void outb(unsigned char value, unsigned short port) {
+    __asm__ __volatile__ (
+        "out    %%al, %%dx\n"
+        : /* no output registers */
+        : "d" (port));
 }

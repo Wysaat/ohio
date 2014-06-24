@@ -6,5 +6,7 @@ void main()
 {
     movxy(0, 11);
     print("Hello C");
+    load_idt();
+    print("Loaded idt");
     while (1) ;
 }

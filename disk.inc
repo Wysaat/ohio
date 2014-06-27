@@ -11,7 +11,7 @@ read_sectors:
     mov    si, ax
     mov    ah, 2
     mov    ch, 0
-    mov    cl, 11
+    ; mov    cl, 11
     mov    dh, 0
     int    0x13
 

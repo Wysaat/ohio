@@ -9,8 +9,8 @@ jmp    start
 %include "gdt.inc"
 
 message1  db "Successfully set up segment and stack registers...", 10, 13, 0
-message2  db "Successfully read 64 sectors from disk...", 10, 13, 0
-message3  db "Failed to read 64 sectors from disk...", 10, 13, 0
+message2  db "Successfully read sectors from disk...", 10, 13, 0
+message3  db "Failed to read sectors from disk...", 10, 13, 0
 message4  db "Successfully loaded a gdt and jumped to 32 bit pmode...", 0
 
 start:
@@ -41,9 +41,25 @@ start:
 ;
     mov    al, 64
     mov    bx, 0x8000
+    mov    cl, 11
     call   read_sectors
     cmp    ax, 0
     jnz    rs_error
+
+; read another 64 sectors from the 11+64=75th sector on disk to 0x8000+512*64=0x10000
+    mov    ax, es
+    push   ax
+    mov    ax, 0x1000
+    mov    es, ax
+    mov    al, 64
+    mov    bx, 0
+    call   read_sectors
+    pop    es
+    mov    cl, 75
+    cmp    ax, 0
+    jnz    rs_error
+    mov    si, message2
+    call   print
 
 rs_succ:
     mov    si, message2

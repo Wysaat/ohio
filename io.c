@@ -5,6 +5,7 @@ int fb_pointer = fb_addr;
 void movxy(int x, int y) {
     __asm__ __volatile__(
         "pusha\n\
+         movl   $0xb8000, fb_pointer\n\
          mov    $2, %%cl\n\
          mul    %%cl\n\
          mov    %%ax, %%cx\n\

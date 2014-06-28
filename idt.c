@@ -19,14 +19,14 @@ struct idt_entry {
     unsigned char  zero;
     unsigned char  type_attr;
     unsigned short offset_hi;
-};
+} __attribute__((__packed__));
 
 struct idt_entry idt_entries[256];
 
 struct {
     unsigned short limit;
     unsigned int   base;
-} idtr;
+} __attribute__((__packed__)) idtr;
 
 void load_idt() {
     // why to minus 1? i don't know
@@ -37,9 +37,10 @@ void load_idt() {
 }
 
 void idt_set_gate(int num, unsigned int offset, unsigned short selector, unsigned char type_attr) {
-    idt_entries[num].offset_lo = (unsigned short)(offset && 0xffff);
+    // CAUTION: use logical and!!! only one '&'!!!
+    idt_entries[num].offset_lo = (unsigned short)(offset & 0xffff);
     idt_entries[num].selector = selector;
     idt_entries[num].zero = (unsigned char)0;
     idt_entries[num].type_attr = type_attr;
-    idt_entries[num].offset_hi = (unsigned char)(offset >> 16);
+    idt_entries[num].offset_hi = (unsigned short)(offset >> 16);
 }

@@ -1,6 +1,8 @@
 /* io.c */
 void movxy(int x, int y);
 void print(char *string);
+void clear();
+void move_cursor(int x, int y);
 unsigned char inb(unsigned short port);
 void outb(unsigned char value, unsigned short port);
 
@@ -14,6 +16,8 @@ void idt_set_gate(int num, unsigned int offset, unsigned short selector, unsigne
 
 /* isr.c */
 void isrs_install();
+
+unsigned timer_ticks;
 
 /* isr.s */
 extern isr0_asm;
@@ -48,3 +52,19 @@ extern isr28_asm;
 extern isr29_asm;
 extern isr30_asm;
 extern isr31_asm;
+extern isr32_asm;
+extern isr33_asm;
+extern isr34_asm;
+extern isr35_asm;
+extern isr36_asm;
+extern isr37_asm;
+extern isr38_asm;
+extern isr39_asm;
+extern isr40_asm;
+extern isr41_asm;
+extern isr42_asm;
+extern isr43_asm;
+extern isr44_asm;
+extern isr45_asm;
+extern isr46_asm;
+extern isr47_asm;

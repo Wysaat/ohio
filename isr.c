@@ -96,6 +96,61 @@ void isr30() {
 void isr31() {
 }
 
+/* irqs */
+
+void isr32() {
+    timer_ticks++;
+}
+
+/* have to read the data from 0x60 no matter need it or not,
+ * or won't get any more interrupts from the keyboard.
+ */
+void isr33() {
+    inb(0x60);
+}
+
+void isr34() {
+}
+
+void isr35() {
+}
+
+void isr36() {
+}
+
+void isr37() {
+}
+
+void isr38() {
+}
+
+void isr39() {
+}
+
+void isr40() {
+}
+
+void isr41() {
+}
+
+void isr42() {
+}
+
+void isr43() {
+}
+
+void isr44() {
+}
+
+void isr45() {
+}
+
+void isr46() {
+}
+
+void isr47() {
+}
+
 // CAUTION: consider carefully what an assembly label is!!!
 void isrs_install() {
     idt_set_gate(0, (unsigned)&isr0_asm, 0x8, 0x8e);
@@ -130,4 +185,20 @@ void isrs_install() {
     idt_set_gate(29, (unsigned)&isr29_asm, 0x8, 0x8e);
     idt_set_gate(30, (unsigned)&isr30_asm, 0x8, 0x8e);
     idt_set_gate(31, (unsigned)&isr31_asm, 0x8, 0x8e);
+    idt_set_gate(32, (unsigned)&isr32_asm, 0x8, 0x8e);
+    idt_set_gate(33, (unsigned)&isr33_asm, 0x8, 0x8e);
+    idt_set_gate(34, (unsigned)&isr34_asm, 0x8, 0x8e);
+    idt_set_gate(35, (unsigned)&isr35_asm, 0x8, 0x8e);
+    idt_set_gate(36, (unsigned)&isr36_asm, 0x8, 0x8e);
+    idt_set_gate(37, (unsigned)&isr37_asm, 0x8, 0x8e);
+    idt_set_gate(38, (unsigned)&isr38_asm, 0x8, 0x8e);
+    idt_set_gate(39, (unsigned)&isr39_asm, 0x8, 0x8e);
+    idt_set_gate(40, (unsigned)&isr40_asm, 0x8, 0x8e);
+    idt_set_gate(41, (unsigned)&isr41_asm, 0x8, 0x8e);
+    idt_set_gate(42, (unsigned)&isr42_asm, 0x8, 0x8e);
+    idt_set_gate(43, (unsigned)&isr43_asm, 0x8, 0x8e);
+    idt_set_gate(44, (unsigned)&isr44_asm, 0x8, 0x8e);
+    idt_set_gate(45, (unsigned)&isr45_asm, 0x8, 0x8e);
+    idt_set_gate(46, (unsigned)&isr46_asm, 0x8, 0x8e);
+    idt_set_gate(47, (unsigned)&isr47_asm, 0x8, 0x8e);
 }

@@ -10,6 +10,9 @@
 
 #define ICW4_8086     0x01
 
+/* look at it carefully! */
+void outb(unsigned char value, unsigned short port);
+
 /* init PIC and remap the irqs */
 void pic_remap(int offset1, int offset2) {
     unsigned char m1, m2;
@@ -19,24 +22,24 @@ void pic_remap(int offset1, int offset2) {
     m2 = inb(PIC2_DATA);
 
     // start the initialization sequence
-    outb(PIC1_COMMAND, ICW1_ICW4 | ICW1_INIT);
-    outb(PIC2_COMMAND, ICW1_ICW4 | ICW1_INIT);
+    outb(ICW1_ICW4 | ICW1_INIT, PIC1_COMMAND);
+    outb(ICW1_ICW4 | ICW1_INIT, PIC2_COMMAND);
 
     // ICW2: master PIC vector offset
-    outb(PIC1_DATA, (unsigned char)offset1);
+    outb((unsigned char)offset1, PIC1_DATA);
     // ICW2: slave PIC vector offset
-    outb(PIC2_DATA, (unsigned char)offset2);
+    outb((unsigned char)offset2, PIC2_DATA);
 
     // ICW3: tell master PIC what irq is connected slave PIC, 80x86 use irq line 2
-    outb(PIC1_DATA, 4);
+    outb(4, PIC1_DATA);
     // ICW3: tell slave PIC the same thing, but use a different notation
-    outb(PIC2_DATA, 2);
+    outb(2, PIC2_DATA);
 
     // ICW4: set how the pic operates
-    outb(PIC1_DATA, ICW4_8086);
-    outb(PIC2_DATA, ICW4_8086);
+    outb(ICW4_8086, PIC1_DATA);
+    outb(ICW4_8086, PIC2_DATA);
 
     // restore masks
-    outb(PIC1_DATA, m1);
-    outb(PIC2_DATA, m2);
+    outb(m1, PIC1_DATA);
+    outb(m2, PIC2_DATA);
 }

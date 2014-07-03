@@ -106,7 +106,7 @@ void isr32() {
  * or won't get any more interrupts from the keyboard.
  */
 void isr33() {
-    inb(0x60);
+    keyboard_handler(inb(0x60));
 }
 
 void isr34() {

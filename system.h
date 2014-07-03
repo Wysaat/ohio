@@ -2,7 +2,13 @@
 void movxy(int x, int y);
 void print(char *string);
 void clear();
+void scroll();
+void putch(char ch);
+void putch2(char ch);
 void move_cursor(int x, int y);
+void move_cursor2(int pos);
+void cursor_tc();
+void delch();
 unsigned char inb(unsigned short port);
 void outb(unsigned char value, unsigned short port);
 
@@ -16,6 +22,9 @@ void idt_set_gate(int num, unsigned int offset, unsigned short selector, unsigne
 
 /* isr.c */
 void isrs_install();
+
+/* keyboard.c */
+void set_scan_code_translation(int enable);
 
 unsigned timer_ticks;
 

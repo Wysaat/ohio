@@ -4,6 +4,8 @@
 
 #include "system.h"
 
+int intpow();
+
 void main()
 {
     movxy(0, 11);
@@ -25,14 +27,29 @@ void main()
     print("initialized the pic");
     pit_setup(1000);
     movxy(0, 16);
-    print("testing the timer, wait 10000 ticks");
-    timer_wait(10000);
-    movxy(0, 17);
-    print("done testing");
-    timer_wait(5000);
-    clear();
+    // print("testing the timer, wait 10000 ticks");
+    // timer_wait(10000);
+    // movxy(0, 17);
+    // print("done testing");
+    // timer_wait(5000);
+    // clear();
+    // print("io is fun");
+    // timer_wait(5000);
+    // move_cursor(0, 0);
+    // scroll();
+    movxy(0, 24);
     print("io is fun");
-    timer_wait(5000);
-    move_cursor(0, 0);
+    putch(' ');
+    putch('h');
+    putch('e');
+    putch('l');
+    putch('l');
+    putch('o');
+    putch('\n');
+    printint(intpow(2, 30));
+    set_scan_code_translation(0);
+    printint(97);
+    timer_wait(10000);
+    set_scan_code_translation(1);
     while (1) ;
 }

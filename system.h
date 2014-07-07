@@ -10,7 +10,9 @@ void move_cursor2(int pos);
 void cursor_tc();
 void delch();
 unsigned char inb(unsigned short port);
+unsigned short inw(unsigned short port);
 void outb(unsigned char value, unsigned short port);
+void outw(unsigned short value, unsigned short port);
 
 /* pic.c */
 void pic_remap(int offset1, int offset2);
@@ -25,6 +27,9 @@ void isrs_install();
 
 /* keyboard.c */
 void set_scan_code_translation(int enable);
+
+/* dist.c */
+void read_disk(int drive, int cylinder, int head, int sector, int sector_count, unsigned short *buffer);
 
 unsigned timer_ticks;
 

@@ -47,9 +47,25 @@ void main()
     putch('o');
     putch('\n');
     printint(intpow(2, 30));
-    set_scan_code_translation(0);
-    printint(97);
-    timer_wait(10000);
-    set_scan_code_translation(1);
+    // set_scan_code_translation(0);
+    // printint(97);
+    // timer_wait(10000);
+    // set_scan_code_translation(1);
+    unsigned short buffer[512];
+    print("\nWill read...\n");
+    int j;
+    for (j = 0; j < 512; j++)
+        buffer[j] = 33;
+    for (j = 1; j < 1024; j++) {
+        read_disk(1, 0, 0, j, 1, buffer);
+        print("Have read!\n");
+        int i;
+        for (i = 0; i < 256; i++) {
+            // endianess?
+            putch(buffer[i] & 0xff);
+            putch(buffer[i] >> 8);
+        }
+        break;
+    }
     while (1) ;
 }

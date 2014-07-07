@@ -42,7 +42,7 @@ void ps2_write_wait() {
 /* 1 enable, 0 disable */
 void set_scan_code_translation(int enable) {
     outb(READ_BYTE0, PS2_REG);
-    // ps2_read_wait();
+    ps2_read_wait();
     unsigned char zbyte = inb(PS2_DATA_PORT);
     print("zbyte is ");
     printint(zbyte);
@@ -142,10 +142,130 @@ int scan_code_set1[] = {
     0,
 };
 
-unsigned char last_code;
+int scan_code_set1_shifted[] = {
+    0,
+    esc,
+    '!',
+    '@',
+    '#',
+    '$',
+    '%',
+    '^',
+    '&',
+    '*',
+    '(',
+    ')',
+    '_',
+    '+',
+    bksp,
+    '\t',
+    'Q',
+    'W',
+    'E',
+    'R',
+    'T',
+    'Y',
+    'U',
+    'I',
+    'O',
+    'P',
+    '{',
+    '}',
+    '\n',
+    l_ctrl,
+    'A',
+    'S',
+    'D',
+    'F',
+    'G',
+    'H',
+    'J',
+    'K',
+    'L',
+    ':',
+    '"',
+    '~',
+    l_shift,
+    '|',
+    'Z',
+    'X',
+    'C',
+    'V',
+    'B',
+    'N',
+    'M',
+    '<',
+    '>',
+    '?',
+    r_shift,
+    '*',
+    l_alt,
+    ' ',
+    caps,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    '7',
+    '8',
+    '9',
+    '-',
+    '4',
+    '5',
+    '6',
+    '1',
+    '2',
+    '3',
+    '.',
+    0,
+};
 
+unsigned char last_code;
+int l_shifted = 0;
+int r_shifted = 0;
+
+/* scan code set 1 */
+#define l_shift_m 0x2a
+#define r_shift_m 0x36
+#define l_shift_b 0xaa
+#define r_shift_b 0xb6
+
+/* scan code set 1 */
 void keyboard_handler(unsigned char code) {
-    int key = scan_code_set1[code];
+    if (code == l_shift_m) {
+        l_shifted++;
+        return;
+    }
+    else if (code == r_shift_m) {
+        r_shifted++;
+        return;
+    }
+    else if (code == l_shift_b) {
+        l_shifted--;
+        return;
+    }
+    else if (code == r_shift_b) {
+        r_shifted--;
+        return;
+    }
+    /* simplifying things now */
+    else if (code >= 0x3a)
+        return;
+
+    int key;
+    if (!(l_shifted || r_shifted))
+        key = scan_code_set1[code];
+    else
+        key = scan_code_set1_shifted[code];
+
     if (key == bksp) {
         delch();
     }

@@ -142,9 +142,26 @@ unsigned char inb(unsigned short port) {
     return ch;
 }
 
+unsigned short inw(unsigned short port) {
+    unsigned short ch;
+    __asm__ __volatile__ (
+        "in     %%dx, %%ax\n"
+        /* output operand constraint should have a constraint modifier "=" */
+        : "=a" (ch)
+        : "d" (port));
+    return ch;
+}
+
 void outb(unsigned char value, unsigned short port) {
     __asm__ __volatile__ (
         "out    %%al, %%dx\n"
+        : /* no output registers */
+        : "a" (value), "d" (port));
+}
+
+void outw(unsigned short value, unsigned short port) {
+    __asm__ __volatile__ (
+        "out    %%ax, %%dx\n"
         : /* no output registers */
         : "a" (value), "d" (port));
 }

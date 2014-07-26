@@ -85,6 +85,10 @@ int intpow(int x, int y) {
 
 /* 2 ** 32 = 4294967296 */
 void printint(int x) {
+    if (x == 0) {
+        putch('0');
+        return;
+    }
     int i = 9, y = 0;
     while (x / intpow(10, i) == 0)
         i--;

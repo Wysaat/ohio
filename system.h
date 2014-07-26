@@ -29,7 +29,8 @@ void isrs_install();
 void set_scan_code_translation(int enable);
 
 /* dist.c */
-void read_disk(int drive, int cylinder, int head, int sector, int sector_count, unsigned short *buffer);
+void read_disk(int drive, long long sector, int sector_count, char *buffer);
+void write_disk(int drive, long long sector, int sector_count, char *buffer);
 
 unsigned timer_ticks;
 

@@ -69,5 +69,10 @@ void main()
     write_disk(1, 1, 1, buffer);
     print("\nHave written!\n");
 
+    setup_table0();
+    print("Have setup table 0\n");
+    setup_paging();
+    print("Have setup paging\n");
+
     while (1) ;
 }

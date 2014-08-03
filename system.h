@@ -28,9 +28,16 @@ void isrs_install();
 /* keyboard.c */
 void set_scan_code_translation(int enable);
 
-/* dist.c */
+/* disk.c */
 void read_disk(int drive, long long sector, int sector_count, char *buffer);
 void write_disk(int drive, long long sector, int sector_count, char *buffer);
+
+/* paging.c */
+void setup_paging();
+void setup_dir_entry(int n, unsigned table_addr, char mode, char rw);
+void setup_tab_entry(unsigned *table, int n, unsigned page_addr, char mode, char rw);
+void setup_tab_entry2(int dn, int tn, unsigned page_addr, char mode, char rw);
+void setup_table0();
 
 unsigned timer_ticks;
 

@@ -94,3 +94,105 @@ void write_disk(int drive, long long sector, int sector_count, char *buffer) {
         outw(s, 0x1f0);
     }
 }
+
+/*
+ * ATA DMA
+ *
+ * must set up at least one Physical Region Descriptor Table (PRDT) in memory per ATA bus,
+ * which contains some number of Physical Region Descriptors (PRDs).
+ * the PRDT must be dword aligned, contiguous in physical memory, and cannot cross a 64k boundary.
+ *
+ * then need to store the physical address of the current PRDT in the Bus Master Register,
+ * of the Bus Mastering ATA Disk Controller on the PCI bus
+ *
+ * half of each DMA transfer is encoded in one qword PRD entry in the table
+ * the low dword is a physical memory address of a data buffer
+ * the next word is a byte count of the transfer size (64k maximum per PRD transfer)
+ * a byte count of 0 means 64k
+ * the next word is reserved (should be 0) except for the MSB.
+ * if the MSB is set, that indicates that this PRD is the last entry in the PRDT,
+ * and the entire set of transfers is complete.
+ * the data buffers cannot cross a 64k boundary, and must be contiguous in physical memory,
+ * the byte count on the data buffers must match the number of sectors transferred by the disk
+ *
+ * the address of the Bus Master Register is stored in BAR4, in the PCI Configuration Space of
+ * the disk controller
+ * the Bus Master Register is generally a set of 16 sequential IO ports,
+ * it can also be a 16 byte memory mapped space.
+ * it's format is
+ *     byte offset    function
+ *     (Primary ATA bus)
+ *     0x0            Command (byte)
+ *     0x2            Status (byte)
+ *     0x4-0x7        PRDT Address (dword)
+ *     (Secondary ATA bus)
+ *     0x8            Command (byte)
+ *     0xa            Status (byte)
+ *     0xc-0xf        PRDT Address (dword)
+ *
+ * the command byte has only 2 operational bits, all the rest should be 0
+ * bit 0 is the start/stop bit, setting the bit puts the controller in DMA mode for
+ * the ATA channel, and it starts at the beginning of the respective PRDT
+ * the bit must be cleared when a transfer completes
+ * when bit 0 cleared, the controller loeses its place in the PRDT
+ * bit 3 is the read/write bit,
+ * the disk controller does not automatically detect whether the next disk operation
+ * is a read or write, you have to tell it in advance, by setting this bit
+ * when reading from the disk, set the bit to 1,
+ * must stop DMA transfers (by clearing bit 0) before changing the read/write bit
+ *
+ * the PCI disk controller only handles the memory half of the DMA transfer, by
+ * interpreting the PRDT, the device driver must separately tell the drive to do its
+ * half of the work
+ * for ATA, for each PRD entry in the PRDT, the driver must issue a read/write DMA
+ * command to the disk, specifying a startLBA and s sector count
+ * when the drive completes each command it sends an IRQ, the driver should then
+ * read the Bus Master Register Status byte
+ * the formats of teh commands are precisely the same as for the 28 and 48 bit PIO
+ * mode Read and Write commands, except for the value sent to the "Command" IO port
+ *
+ * command byte    function
+ * 0xc8            read DMA (28 bit LBA)
+ * 0x25            read DMA (28 bit LBA)
+ * 0xca            write DMA (28 bit LBA)
+ * 0x35            write DMA (48 bit LBA)
+ *
+ */
+
+/*
+ * Current disk controller always support two ATA buses per chip,
+ * the standard IRQ for the Primary bus is IRQ14, and IRQ15 for the Secondary bus.
+ *
+ * the actual control registers and IRQs for each bus can often be determined
+ * by enumerating the PCI bus, finding all the disk controllers, and reading the
+ * information from each controller's PCI Configuration Space.
+ *
+ * standard controller IO ports detection
+ * using the IDENTIFY command  to detect the existence of all types of ATA bus devices
+ * to use the IDENTIFY command, select a target drive by sending 0xa0 for the master drive,
+ * or 0xb0 for the slave, to the "drive select" IO port.
+ */
+
+ /*
+  * the "address" of the bus mastering register is stored in bar4, in the PCI configuration space
+  * for the disk controller, the bus master registe is generally a set of 16 sequential IO ports
+  * it can also be a 16 byte memory mapped space
+  *
+  * you must set up at least one physical region descriptor table in memory per ATA bus, which contains
+  * some number of physical region Descriptors
+  * then you need to store the physical address of the current prdt in the bus master register of the
+  * bus mastering ata disk controller on the pci bus
+  */
+
+/* pci configuration address is a 32-bit register with the format
+ * bit(s) 31    enable bit
+ *        30-24 reserved
+ *        23-16 bus number
+ *        15-11 device number
+ *        10-8  function number
+ *        7-2   register number
+ *        1-0   00
+ *
+ * vendor ID of 0xffff is an invalid value that will be returned on read access to
+ * configuration space registers of non-existent devices
+ */
